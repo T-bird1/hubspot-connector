@@ -39,11 +39,11 @@ from fastapi.responses import JSONResponse
 @app.get("/schema.json")
 def schema():
     return JSONResponse({
-        "openapi": "3.0.3",
-        "info": {"title": "ChatGPT Connector", "version": "1.0.0"},
+        "openapi": "3.0.1",
+        "info": { "title": "ChatGPT Connector", "version": "1.0.0" },
         "servers": [
-            {"url": "https://hubspot-connector.onrender.com"},
-            {"url": "https://hubspot-connector.onrender.com/"}  # some tools require trailing slash
+            { "url": "https://hubspot-connector.onrender.com" },
+            { "url": "https://hubspot-connector.onrender.com/" }
         ],
         "paths": {
             "/top-companies": {
@@ -51,8 +51,8 @@ def schema():
                     "operationId": "getTopCompanies",
                     "summary": "Top companies by ticket count",
                     "parameters": [
-                        {"name": "days", "in": "query", "schema": {"type": "integer", "minimum": 0}, "required": False},
-                        {"name": "top",  "in": "query", "schema": {"type": "integer", "minimum": 1, "maximum": 50}, "required": False}
+                        { "name": "days", "in": "query", "schema": { "type": "integer", "minimum": 0 }, "required": false },
+                        { "name": "top",  "in": "query", "schema": { "type": "integer", "minimum": 1, "maximum": 50 }, "required": false }
                     ],
                     "responses": {
                         "200": {
@@ -67,15 +67,15 @@ def schema():
                                                 "items": {
                                                     "type": "object",
                                                     "properties": {
-                                                        "rank": {"type": "integer"},
-                                                        "companyId": {"type": "string"},
-                                                        "companyName": {"type": "string"},
-                                                        "ticketCount": {"type": "integer"}
+                                                        "rank": { "type": "integer" },
+                                                        "companyId": { "type": "string" },
+                                                        "companyName": { "type": "string" },
+                                                        "ticketCount": { "type": "integer" }
                                                     },
                                                     "required": ["rank","companyId","ticketCount"]
                                                 }
                                             },
-                                            "total_tickets": {"type": "integer"}
+                                            "total_tickets": { "type": "integer" }
                                         },
                                         "required": ["total_tickets"]
                                     }
@@ -88,12 +88,8 @@ def schema():
         },
         "components": {
             "securitySchemes": {
-                "apiKeyAuth": {
-                    "type": "apiKey",
-                    "in": "header",
-                    "name": "Authorization"
-                }
+                "apiKeyAuth": { "type": "apiKey", "in": "header", "name": "Authorization" }
             }
         },
-        "security": [{"apiKeyAuth": []}]
+        "security": [{ "apiKeyAuth": [] }]
     })
