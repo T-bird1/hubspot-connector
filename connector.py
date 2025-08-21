@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Query
-import httpx, os
+from fastapi.responses import JSONResponse
 from fastapi.openapi.utils import get_openapi
+import httpx, os
 
 BRIDGE_URL = os.getenv("BRIDGE_URL")
 BRIDGE_SECRET = os.getenv("BRIDGE_SECRET")
@@ -18,26 +19,9 @@ async def top_companies(days: int = Query(0), top: int = Query(5)):
         )
         return r.json()
 
-def custom_openapi():
-    if app.openapi_schema:
-        return app.openapi_schema
-    openapi_schema = get_openapi(
-        title=app.title,
-        version="1.0.0",
-        routes=app.routes,
-    )
-    openapi_schema["servers"] = [
-        {"url": "https://hubspot-connector.onrender.com"}
-    ]
-    app.openapi_schema = openapi_schema
-    return app.openapi_schema
-
-app.openapi = custom_openapi
-
-from fastapi.responses import JSONResponse
-
 @app.get("/schema.json")
 def schema():
+    # Static OpenAPI schema with explicit servers
     return JSONResponse({
         "openapi": "3.0.1",
         "info": { "title": "ChatGPT Connector", "version": "1.0.0" },
@@ -51,8 +35,8 @@ def schema():
                     "operationId": "getTopCompanies",
                     "summary": "Top companies by ticket count",
                     "parameters": [
-                        { "name": "days", "in": "query", "schema": { "type": "integer", "minimum": 0 }, "required": false },
-                        { "name": "top",  "in": "query", "schema": { "type": "integer", "minimum": 1, "maximum": 50 }, "required": false }
+                        { "name": "days", "in": "query", "schema": { "type": "integer", "minimum": 0 }, "required": False },
+                        { "name": "top",  "in": "query", "schema": { "type": "integer", "minimum": 1, "maximum": 50 }, "required": False }
                     ],
                     "responses": {
                         "200": {
@@ -82,7 +66,8 @@ def schema():
                                 }
                             }
                         }
-                    }
+                    },
+                    "security": [{ "apiKeyAuth": [] }]
                 }
             }
         },
@@ -90,6 +75,5 @@ def schema():
             "securitySchemes": {
                 "apiKeyAuth": { "type": "apiKey", "in": "header", "name": "Authorization" }
             }
-        },
-        "security": [{ "apiKeyAuth": [] }]
+        }
     })
