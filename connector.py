@@ -79,4 +79,66 @@ def schema():
                     "summary": "Top companies by ticket count",
                     "parameters": [
                         {"name": "days", "in": "query", "schema": {"type": "integer", "minimum": 0}, "required": False},
-                        {"name": "top", "in"
+                        {"name": "top", "in": "query", "schema": {"type": "integer", "minimum": 1, "maximum": 50}, "required": False},
+                        {"name": "pipeline", "in": "query", "schema": {"type": "string"}, "required": False},
+                        {"name": "stage", "in": "query", "schema": {"type": "string"}, "required": False}
+                    ],
+                    "responses": {
+                        "200": {
+                            "description": "OK",
+                            "content": {
+                                "application/json": {
+                                    "schema": {
+                                        "type": "object",
+                                        "properties": {
+                                            "items": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "rank": {"type": "integer"},
+                                                        "companyId": {"type": "string"},
+                                                        "companyName": {"type": "string"},
+                                                        "ticketCount": {"type": "integer"}
+                                                    },
+                                                    "required": ["rank", "companyId", "ticketCount"]
+                                                }
+                                            },
+                                            "total_tickets": {"type": "integer"}
+                                        },
+                                        "required": ["total_tickets"]
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "security": [{"apiKeyAuth": []}]
+                }
+            },
+            "/ticketsSearch": {
+                "get": {
+                    "operationId": "ticketsSearch",
+                    "summary": "Search tickets",
+                    "parameters": [
+                        {"name": "limit", "in": "query", "schema": {"type": "integer", "minimum": 1, "maximum": 100}, "required": False},
+                        {"name": "after", "in": "query", "schema": {"type": "string"}, "required": False},
+                        {"name": "properties", "in": "query", "schema": {"type": "array", "items": {"type": "string"}}, "required": False},
+                        {"name": "associations", "in": "query", "schema": {"type": "array", "items": {"type": "string"}}, "required": False}
+                    ],
+                    "responses": {
+                        "200": {
+                            "description": "OK",
+                            "content": {
+                                "application/json": {
+                                    "schema": {"type": "object"}
+                                }
+                            }
+                        }
+                    },
+                    "security": [{"apiKeyAuth": []}]
+                }
+            }
+        },
+        "components": {
+            "securitySchemes": {
+                "apiKeyAuth": {"type": "apiKey", "in": "header", "name": "Authorization"
