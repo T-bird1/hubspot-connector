@@ -19,8 +19,10 @@ async def tickets_top_companies(
     stage: Optional[str] = Query(None)
 ):
     params = {"days": days, "top": top}
-    if pipeline: params["pipeline"] = pipeline
-    if stage: params["stage"] = stage
+    if pipeline:
+        params["pipeline"] = pipeline
+    if stage:
+        params["stage"] = stage
 
     async with httpx.AsyncClient() as client:
         r = await client.get(
@@ -42,9 +44,12 @@ async def tickets_search(
     associations: Optional[List[str]] = Query(None)
 ):
     params = {"limit": limit}
-    if after: params["after"] = after
-    if properties: params["properties"] = properties
-    if associations: params["associations"] = associations
+    if after:
+        params["after"] = after
+    if properties:
+        params["properties"] = properties
+    if associations:
+        params["associations"] = associations
 
     async with httpx.AsyncClient() as client:
         r = await client.get(
@@ -62,10 +67,10 @@ async def tickets_search(
 def schema():
     return JSONResponse({
         "openapi": "3.0.1",
-        "info": { "title": "ChatGPT Connector", "version": "1.0.0" },
+        "info": {"title": "ChatGPT Connector", "version": "1.0.0"},
         "servers": [
-            { "url": "https://hubspot-connector.onrender.com" },
-            { "url": "https://hubspot-connector.onrender.com/" }
+            {"url": "https://hubspot-connector.onrender.com"},
+            {"url": "https://hubspot-connector.onrender.com/"}
         ],
         "paths": {
             "/ticketsTopCompanies": {
@@ -73,20 +78,5 @@ def schema():
                     "operationId": "ticketsTopCompanies",
                     "summary": "Top companies by ticket count",
                     "parameters": [
-                        { "name": "days", "in": "query", "schema": { "type": "integer", "minimum": 0 }, "required": False },
-                        { "name": "top",  "in": "query", "schema": { "type": "integer", "minimum": 1, "maximum": 50 }, "required": False },
-                        { "name": "pipeline", "in": "query", "schema": { "type": "string" }, "required": False },
-                        { "name": "stage", "in": "query", "schema": { "type": "string" }, "required": False }
-                    ],
-                    "responses": { "200": { "description": "OK" } },
-                    "security": [{ "apiKeyAuth": [] }]
-                }
-            },
-            "/ticketsSearch": {
-                "get": {
-                    "operationId": "ticketsSearch",
-                    "summary": "Search tickets",
-                    "parameters": [
-                        { "name": "limit", "in": "query", "schema": { "type": "integer", "minimum": 1, "maximum": 100 }, "required": False },
-                        { "name": "after", "in": "query", "schema": { "type": "string" }, "required": False },
-                        { "name": "properties", "in": "query", "schema": { "type": "array", "items": { "type": "string" } }, "requ
+                        {"name": "days", "in": "query", "schema": {"type": "integer", "minimum": 0}, "required": False},
+                        {"name": "top", "in"
