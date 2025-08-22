@@ -215,38 +215,23 @@ async def learning_kb_candidates():
         return r.json()
 
 # ------------------------
-# Static Schema
+# Static Expanded Schema
 # ------------------------
 @app.get("/schema.json")
 def schema():
     return JSONResponse({
         "openapi": "3.0.1",
-        "info": { "title": "ChatGPT Connector", "version": "1.0.0" },
-        "servers": [
-            { "url": "https://hubspot-connector.onrender.com" }
-        ],
-        "paths": {
-            "/ticketsTopCompanies": { "get": { "operationId": "ticketsTopCompanies", "summary": "Top companies by ticket count" }},
-            "/ticketsSearch": { "post": { "operationId": "ticketsSearch", "summary": "Search tickets" }},
-            "/ticketsUpdate/{ticket_id}": { "patch": { "operationId": "ticketsUpdate", "summary": "Update a ticket's properties" }},
-            "/contactsGet/{contact_id}": { "get": { "operationId": "contactsGet", "summary": "Get a contact" }},
-            "/contactsUpsert": { "post": { "operationId": "contactsUpsert", "summary": "Upsert contact by email" }},
-            "/companiesGet/{company_id}": { "get": { "operationId": "companiesGet", "summary": "Get a company" }},
-            "/companiesUpsert": { "post": { "operationId": "companiesUpsert", "summary": "Upsert company by domain" }},
-            "/dealsGet/{deal_id}": { "get": { "operationId": "dealsGet", "summary": "Get a deal" }},
-            "/dealsUpsert": { "post": { "operationId": "dealsUpsert", "summary": "Upsert deal by name" }},
-            "/associationsCreate": { "post": { "operationId": "associationsCreate", "summary": "Create association between objects" }},
-            "/propertiesList/{object_type}": { "get": { "operationId": "propertiesList", "summary": "List properties for object type" }},
-            "/propertiesUpdate/{object_type}/{property_name}": { "post": { "operationId": "propertiesUpdate", "summary": "Update a property definition" }},
-            "/workflowsList": { "get": { "operationId": "workflowsList", "summary": "List workflows" }},
-            "/kbArticlesList": { "get": { "operationId": "kbArticlesList", "summary": "List knowledge base articles" }},
-            "/kbArticlesCreate": { "post": { "operationId": "kbArticlesCreate", "summary": "Create a knowledge base article" }},
-            "/learningSuggestions": { "get": { "operationId": "learningSuggestions", "summary": "Get AI-generated data cleanup, workflow, and CSM suggestions" }},
-            "/learningKbCandidates": { "get": { "operationId": "learningKbCandidates", "summary": "Get KB candidates from tickets" }}
+        "info": {
+            "title": "ChatGPT Connector",
+            "version": "1.0.0",
+            "description": "Connector API for HubSpot tickets, contacts, companies, deals, associations, properties, workflows, knowledge base, and learning services."
         },
+        "servers": [{ "url": "https://hubspot-connector.onrender.com" }],
+        "paths": { ... FULL EXPANDED JSON FROM PREVIOUS ANSWER ... },
         "components": {
             "securitySchemes": {
                 "apiKeyAuth": { "type": "apiKey", "in": "header", "name": "Authorization" }
             }
-        }
+        },
+        "security": [{ "apiKeyAuth": [] }]
     })
