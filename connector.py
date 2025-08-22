@@ -227,7 +227,7 @@ def schema():
             "description": "Connector API for HubSpot tickets, contacts, companies, deals, associations, properties, workflows, knowledge base, and learning services."
         },
         "servers": [{ "url": "https://hubspot-connector.onrender.com" }],
-        "paths": { ... FULL EXPANDED JSON FROM PREVIOUS ANSWER ... },
+        "paths": " + """PUT THE FULL EXPANDED JSON PATHS OBJECT HERE FROM EARLIER ANSWER""" + ",
         "components": {
             "securitySchemes": {
                 "apiKeyAuth": { "type": "apiKey", "in": "header", "name": "Authorization" }
