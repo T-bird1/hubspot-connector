@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Query
 from fastapi.responses import JSONResponse
 import httpx, os
+from typing import List, Optional
 
 BRIDGE_URL = os.getenv("BRIDGE_URL")
 BRIDGE_SECRET = os.getenv("BRIDGE_SECRET")
@@ -11,11 +12,20 @@ app = FastAPI(title="ChatGPT Connector")
 # Tickets Top Companies
 # ---------------------------
 @app.get("/ticketsTopCompanies")
-async def tickets_top_companies(days: int = Query(0), top: int = Query(5)):
+async def tickets_top_companies(
+    days: int = Query(0, ge=0),
+    top: int = Query(5, ge=1, le=50),
+    pipeline: Optional[str] = Query(None),
+    stage: Optional[str] = Query(None)
+):
+    params = {"days": days, "top": top}
+    if pipeline: params["pipeline"] = pipeline
+    if stage: params["stage"] = stage
+
     async with httpx.AsyncClient() as client:
         r = await client.get(
             f"{BRIDGE_URL}/tickets/top-companies",
-            params={"days": days, "top": top},
+            params=params,
             headers={"Authorization": BRIDGE_SECRET},
             timeout=60
         )
@@ -25,11 +35,21 @@ async def tickets_top_companies(days: int = Query(0), top: int = Query(5)):
 # Tickets Search
 # ---------------------------
 @app.get("/ticketsSearch")
-async def tickets_search(limit: int = Query(5)):
+async def tickets_search(
+    limit: int = Query(5, ge=1, le=100),
+    after: Optional[str] = Query(None),
+    properties: Optional[List[str]] = Query(None),
+    associations: Optional[List[str]] = Query(None)
+):
+    params = {"limit": limit}
+    if after: params["after"] = after
+    if properties: params["properties"] = properties
+    if associations: params["associations"] = associations
+
     async with httpx.AsyncClient() as client:
         r = await client.get(
             f"{BRIDGE_URL}/tickets/search",
-            params={"limit": limit},
+            params=params,
             headers={"Authorization": BRIDGE_SECRET},
             timeout=60
         )
@@ -54,37 +74,11 @@ def schema():
                     "summary": "Top companies by ticket count",
                     "parameters": [
                         { "name": "days", "in": "query", "schema": { "type": "integer", "minimum": 0 }, "required": False },
-                        { "name": "top",  "in": "query", "schema": { "type": "integer", "minimum": 1, "maximum": 50 }, "required": False }
+                        { "name": "top",  "in": "query", "schema": { "type": "integer", "minimum": 1, "maximum": 50 }, "required": False },
+                        { "name": "pipeline", "in": "query", "schema": { "type": "string" }, "required": False },
+                        { "name": "stage", "in": "query", "schema": { "type": "string" }, "required": False }
                     ],
-                    "responses": {
-                        "200": {
-                            "description": "OK",
-                            "content": {
-                                "application/json": {
-                                    "schema": {
-                                        "type": "object",
-                                        "properties": {
-                                            "items": {
-                                                "type": "array",
-                                                "items": {
-                                                    "type": "object",
-                                                    "properties": {
-                                                        "rank": { "type": "integer" },
-                                                        "companyId": { "type": "string" },
-                                                        "companyName": { "type": "string" },
-                                                        "ticketCount": { "type": "integer" }
-                                                    },
-                                                    "required": ["rank","companyId","ticketCount"]
-                                                }
-                                            },
-                                            "total_tickets": { "type": "integer" }
-                                        },
-                                        "required": ["total_tickets"]
-                                    }
-                                }
-                            }
-                        }
-                    },
+                    "responses": { "200": { "description": "OK" } },
                     "security": [{ "apiKeyAuth": [] }]
                 }
             },
@@ -93,27 +87,6 @@ def schema():
                     "operationId": "ticketsSearch",
                     "summary": "Search tickets",
                     "parameters": [
-                        { "name": "limit", "in": "query", "schema": { "type": "integer", "minimum": 1, "maximum": 100 }, "required": False }
-                    ],
-                    "responses": {
-                        "200": {
-                            "description": "OK",
-                            "content": {
-                                "application/json": {
-                                    "schema": {
-                                        "type": "object"
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "security": [{ "apiKeyAuth": [] }]
-                }
-            }
-        },
-        "components": {
-            "securitySchemes": {
-                "apiKeyAuth": { "type": "apiKey", "in": "header", "name": "Authorization" }
-            }
-        }
-    })
+                        { "name": "limit", "in": "query", "schema": { "type": "integer", "minimum": 1, "maximum": 100 }, "required": False },
+                        { "name": "after", "in": "query", "schema": { "type": "string" }, "required": False },
+                        { "name": "properties", "in": "query", "schema": { "type": "array", "items": { "type": "string" } }, "requ
