@@ -64,6 +64,13 @@ async def contacts_upsert(body: Dict[str, Any] = Body(...)):
                               headers={"Authorization": BRIDGE_SECRET}, timeout=60)
         return r.json()
 
+@app.post("/contacts/search")
+async def contacts_search(body: Dict[str, Any] = Body(...)):
+    async with httpx.AsyncClient() as client:
+        r = await client.post(f"{BRIDGE_URL}/contacts/search", json=body,
+                              headers={"Authorization": BRIDGE_SECRET}, timeout=60)
+        return r.json()
+
 # ---------------------------
 # Companies
 # ---------------------------
@@ -81,6 +88,13 @@ async def companies_upsert(body: Dict[str, Any] = Body(...)):
                               headers={"Authorization": BRIDGE_SECRET}, timeout=60)
         return r.json()
 
+@app.post("/companies/search")
+async def companies_search(body: Dict[str, Any] = Body(...)):
+    async with httpx.AsyncClient() as client:
+        r = await client.post(f"{BRIDGE_URL}/companies/search", json=body,
+                              headers={"Authorization": BRIDGE_SECRET}, timeout=60)
+        return r.json()
+
 # ---------------------------
 # Deals
 # ---------------------------
@@ -95,6 +109,13 @@ async def deals_get(deal_id: str = Path(...)):
 async def deals_upsert(body: Dict[str, Any] = Body(...)):
     async with httpx.AsyncClient() as client:
         r = await client.post(f"{BRIDGE_URL}/deals/upsert", json=body,
+                              headers={"Authorization": BRIDGE_SECRET}, timeout=60)
+        return r.json()
+
+@app.post("/deals/search")
+async def deals_search(body: Dict[str, Any] = Body(...)):
+    async with httpx.AsyncClient() as client:
+        r = await client.post(f"{BRIDGE_URL}/deals/search", json=body,
                               headers={"Authorization": BRIDGE_SECRET}, timeout=60)
         return r.json()
 
@@ -168,16 +189,19 @@ def schema():
             {"url": "https://hubspot-connector.onrender.com/"}
         ],
         "paths": {
-            "/health": {"get": {"operationId": "health", "summary": "Health check"}},
+            "/health": {"get": {"operationId": "health"}},
             "/tickets/top-companies": {"get": {"operationId": "ticketsTopCompanies"}},
             "/tickets/search": {"post": {"operationId": "ticketsSearch"}},
             "/tickets/update/{ticket_id}": {"patch": {"operationId": "ticketsUpdate"}},
             "/contacts/get/{contact_id}": {"get": {"operationId": "contactsGet"}},
             "/contacts/upsert": {"post": {"operationId": "contactsUpsert"}},
+            "/contacts/search": {"post": {"operationId": "contactsSearch"}},
             "/companies/get/{company_id}": {"get": {"operationId": "companiesGet"}},
             "/companies/upsert": {"post": {"operationId": "companiesUpsert"}},
+            "/companies/search": {"post": {"operationId": "companiesSearch"}},
             "/deals/get/{deal_id}": {"get": {"operationId": "dealsGet"}},
             "/deals/upsert": {"post": {"operationId": "dealsUpsert"}},
+            "/deals/search": {"post": {"operationId": "dealsSearch"}},
             "/associations/create": {"post": {"operationId": "associationsCreate"}},
             "/properties/list/{object_type}": {"get": {"operationId": "propertiesList"}},
             "/properties/update/{object_type}/{property_name}": {"post": {"operationId": "propertiesUpdate"}},
