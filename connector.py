@@ -212,6 +212,7 @@ async def learning_kb_candidates():
 # ------------------------
 @app.get("/schema.json")
 def schema():
-    with open("schema.json", "r") as f:
+    # Always serve the patched static-schema.json so ChatGPT gets correct mappings
+    with open("static-schema.json", "r") as f:
         schema_data = json.load(f)
     return JSONResponse(schema_data)
