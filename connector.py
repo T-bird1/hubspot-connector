@@ -1,196 +1,134 @@
-from fastapi import FastAPI, Query, Path, Body
+from fastapi import FastAPI, Query
 from fastapi.responses import JSONResponse
 import httpx, os
-from typing import Optional, Dict, Any
 
 BRIDGE_URL = os.getenv("BRIDGE_URL")
 BRIDGE_SECRET = os.getenv("BRIDGE_SECRET")
 
-if not BRIDGE_URL:
-    raise RuntimeError("BRIDGE_URL env var is required")
-if not BRIDGE_SECRET:
-    raise RuntimeError("BRIDGE_SECRET env var is required")
+app = FastAPI(title="ChatGPT Connector")
 
-app = FastAPI(title="ChatGPT Connector (Full)")
+async def proxy_get(path: str, params: dict = None):
+    async with httpx.AsyncClient() as client:
+        r = await client.get(f"{BRIDGE_URL}{path}", params=params, headers={"Authorization": BRIDGE_SECRET}, timeout=60)
+        return r.json()
 
-# ---------------------------
-# Health Check
-# ---------------------------
+async def proxy_post(path: str, body: dict = None):
+    async with httpx.AsyncClient() as client:
+        r = await client.post(f"{BRIDGE_URL}{path}", json=body, headers={"Authorization": BRIDGE_SECRET}, timeout=60)
+        return r.json()
+
+async def proxy_patch(path: str, body: dict = None):
+    async with httpx.AsyncClient() as client:
+        r = await client.patch(f"{BRIDGE_URL}{path}", json=body, headers={"Authorization": BRIDGE_SECRET}, timeout=60)
+        return r.json()
+
 @app.get("/health")
-def health():
-    return {"status": "ok"}
+async def health():
+    return {"ok": True}
 
 # ---------------------------
 # Tickets
 # ---------------------------
-@app.get("/tickets/top-companies")
-async def tickets_top_companies(
-    days: int = Query(0, ge=0),
-    top: int = Query(5, ge=1, le=50),
-    pipeline: Optional[str] = Query(None),
-    stage: Optional[str] = Query(None)
-):
-    params = {"days": days, "top": top}
-    if pipeline: params["pipeline"] = pipeline
-    if stage: params["stage"] = stage
-    async with httpx.AsyncClient() as client:
-        r = await client.get(f"{BRIDGE_URL}/tickets/top-companies", params=params,
-                             headers={"Authorization": BRIDGE_SECRET}, timeout=60)
-        return r.json()
+@app.get("/ticketsTopCompanies")
+async def tickets_top_companies(days: int = Query(0), top: int = Query(5), pipeline: str = None, stage: str = None):
+    return await proxy_get("/tickets/top-companies", {"days": days, "top": top, "pipeline": pipeline, "stage": stage})
 
-@app.post("/tickets/search")
-async def tickets_search(body: Dict[str, Any] = Body(...)):
-    async with httpx.AsyncClient() as client:
-        r = await client.post(f"{BRIDGE_URL}/tickets/search", json=body,
-                              headers={"Authorization": BRIDGE_SECRET}, timeout=60)
-        return r.json()
+@app.post("/ticketsSearch")
+async def tickets_search(body: dict):
+    return await proxy_post("/tickets/search", body)
 
-@app.patch("/tickets/update/{ticket_id}")
-async def tickets_update(ticket_id: str = Path(...), properties: Dict[str, Any] = Body(...)):
-    async with httpx.AsyncClient() as client:
-        r = await client.patch(f"{BRIDGE_URL}/tickets/update/{ticket_id}", json=properties,
-                               headers={"Authorization": BRIDGE_SECRET}, timeout=60)
-        return r.json()
+@app.patch("/ticketsUpdate/{ticket_id}")
+async def tickets_update(ticket_id: str, body: dict):
+    return await proxy_patch(f"/tickets/update/{ticket_id}", body)
 
 # ---------------------------
 # Contacts
 # ---------------------------
-@app.get("/contacts/get/{contact_id}")
-async def contacts_get(contact_id: str = Path(...)):
-    async with httpx.AsyncClient() as client:
-        r = await client.get(f"{BRIDGE_URL}/contacts/get/{contact_id}",
-                             headers={"Authorization": BRIDGE_SECRET}, timeout=60)
-        return r.json()
+@app.get("/contactsGet/{contact_id}")
+async def contacts_get(contact_id: str):
+    return await proxy_get(f"/contacts/get/{contact_id}")
 
-@app.post("/contacts/upsert")
-async def contacts_upsert(body: Dict[str, Any] = Body(...)):
-    async with httpx.AsyncClient() as client:
-        r = await client.post(f"{BRIDGE_URL}/contacts/upsert", json=body,
-                              headers={"Authorization": BRIDGE_SECRET}, timeout=60)
-        return r.json()
+@app.post("/contactsUpsert")
+async def contacts_upsert(body: dict):
+    return await proxy_post("/contacts/upsert", body)
 
-@app.post("/contacts/search")
-async def contacts_search(body: Dict[str, Any] = Body(...)):
-    async with httpx.AsyncClient() as client:
-        r = await client.post(f"{BRIDGE_URL}/contacts/search", json=body,
-                              headers={"Authorization": BRIDGE_SECRET}, timeout=60)
-        return r.json()
+@app.post("/contactsSearch")
+async def contacts_search(body: dict):
+    return await proxy_post("/contacts/search", body)
 
 # ---------------------------
 # Companies
 # ---------------------------
-@app.get("/companies/get/{company_id}")
-async def companies_get(company_id: str = Path(...)):
-    async with httpx.AsyncClient() as client:
-        r = await client.get(f"{BRIDGE_URL}/companies/get/{company_id}",
-                             headers={"Authorization": BRIDGE_SECRET}, timeout=60)
-        return r.json()
+@app.get("/companiesGet/{company_id}")
+async def companies_get(company_id: str):
+    return await proxy_get(f"/companies/get/{company_id}")
 
-@app.post("/companies/upsert")
-async def companies_upsert(body: Dict[str, Any] = Body(...)):
-    async with httpx.AsyncClient() as client:
-        r = await client.post(f"{BRIDGE_URL}/companies/upsert", json=body,
-                              headers={"Authorization": BRIDGE_SECRET}, timeout=60)
-        return r.json()
+@app.post("/companiesUpsert")
+async def companies_upsert(body: dict):
+    return await proxy_post("/companies/upsert", body)
 
-@app.post("/companies/search")
-async def companies_search(body: Dict[str, Any] = Body(...)):
-    async with httpx.AsyncClient() as client:
-        r = await client.post(f"{BRIDGE_URL}/companies/search", json=body,
-                              headers={"Authorization": BRIDGE_SECRET}, timeout=60)
-        return r.json()
+@app.post("/companiesSearch")
+async def companies_search(body: dict):
+    return await proxy_post("/companies/search", body)
 
 # ---------------------------
 # Deals
 # ---------------------------
-@app.get("/deals/get/{deal_id}")
-async def deals_get(deal_id: str = Path(...)):
-    async with httpx.AsyncClient() as client:
-        r = await client.get(f"{BRIDGE_URL}/deals/get/{deal_id}",
-                             headers={"Authorization": BRIDGE_SECRET}, timeout=60)
-        return r.json()
+@app.get("/dealsGet/{deal_id}")
+async def deals_get(deal_id: str):
+    return await proxy_get(f"/deals/get/{deal_id}")
 
-@app.post("/deals/upsert")
-async def deals_upsert(body: Dict[str, Any] = Body(...)):
-    async with httpx.AsyncClient() as client:
-        r = await client.post(f"{BRIDGE_URL}/deals/upsert", json=body,
-                              headers={"Authorization": BRIDGE_SECRET}, timeout=60)
-        return r.json()
+@app.post("/dealsUpsert")
+async def deals_upsert(body: dict):
+    return await proxy_post("/deals/upsert", body)
 
-@app.post("/deals/search")
-async def deals_search(body: Dict[str, Any] = Body(...)):
-    async with httpx.AsyncClient() as client:
-        r = await client.post(f"{BRIDGE_URL}/deals/search", json=body,
-                              headers={"Authorization": BRIDGE_SECRET}, timeout=60)
-        return r.json()
+@app.post("/dealsSearch")
+async def deals_search(body: dict):
+    return await proxy_post("/deals/search", body)
 
 # ---------------------------
 # Associations
 # ---------------------------
-@app.post("/associations/create")
-async def associations_create(body: Dict[str, Any] = Body(...)):
-    async with httpx.AsyncClient() as client:
-        r = await client.post(f"{BRIDGE_URL}/associations/create", json=body,
-                              headers={"Authorization": BRIDGE_SECRET}, timeout=60)
-        return r.json()
+@app.post("/associationsCreate")
+async def associations_create(body: dict):
+    return await proxy_post("/associations/create", body)
 
 # ---------------------------
 # Properties
 # ---------------------------
-@app.get("/properties/list/{object_type}")
-async def properties_list(object_type: str = Path(...)):
-    async with httpx.AsyncClient() as client:
-        r = await client.get(f"{BRIDGE_URL}/properties/list/{object_type}",
-                             headers={"Authorization": BRIDGE_SECRET}, timeout=60)
-        return r.json()
+@app.get("/propertiesList/{object_type}")
+async def properties_list(object_type: str):
+    return await proxy_get(f"/properties/list/{object_type}")
 
-@app.post("/properties/update/{object_type}/{property_name}")
-async def properties_update(object_type: str = Path(...), property_name: str = Path(...), body: Dict[str, Any] = Body(...)):
-    async with httpx.AsyncClient() as client:
-        r = await client.post(f"{BRIDGE_URL}/properties/update/{object_type}/{property_name}", json=body,
-                              headers={"Authorization": BRIDGE_SECRET}, timeout=60)
-        return r.json()
+@app.post("/propertiesUpdate/{object_type}/{property_name}")
+async def properties_update(object_type: str, property_name: str, body: dict):
+    return await proxy_post(f"/properties/update/{object_type}/{property_name}", body)
 
 # ---------------------------
 # Workflows
 # ---------------------------
-@app.get("/workflows/list")
+@app.get("/workflowsList")
 async def workflows_list():
-    async with httpx.AsyncClient() as client:
-        r = await client.get(f"{BRIDGE_URL}/workflows/list",
-                             headers={"Authorization": BRIDGE_SECRET}, timeout=60)
-        return r.json()
+    return await proxy_get("/workflows/list")
 
 # ---------------------------
 # Knowledge Base
 # ---------------------------
-@app.get("/kb/articles/list")
-async def kb_articles_list(limit: int = Query(20, ge=1, le=100), after: Optional[str] = Query(None)):
-    params = {"limit": limit}
-    if after:
-        params["after"] = after
-    async with httpx.AsyncClient() as client:
-        r = await client.get(f"{BRIDGE_URL}/kb/articles/list", params=params,
-                             headers={"Authorization": BRIDGE_SECRET}, timeout=60)
-        return r.json()
+@app.get("/kbArticlesList")
+async def kb_articles_list(limit: int = Query(20), after: str = None):
+    return await proxy_get("/kb/articles/list", {"limit": limit, "after": after})
 
-@app.post("/kb/articles/create")
-async def kb_articles_create(body: Dict[str, Any] = Body(...)):
-    async with httpx.AsyncClient() as client:
-        r = await client.post(f"{BRIDGE_URL}/kb/articles/create", json=body,
-                              headers={"Authorization": BRIDGE_SECRET}, timeout=60)
-        return r.json()
+@app.post("/kbArticlesCreate")
+async def kb_articles_create(body: dict):
+    return await proxy_post("/kb/articles/create", body)
 
 # ---------------------------
-# Static Schema
+# Schema
 # ---------------------------
 @app.get("/schema.json")
 def schema():
     return JSONResponse({
         "openapi": "3.0.1",
-        "info": {"title": "ChatGPT Connector (Full)", "version": "1.0.0"},
-        "servers": [
-            {"url": "https://hubspot-connector.onrender.com"},
-            {"url": "https://hubspot-connector.onrender.com/"}
-        ]
+        "info": {"title": "ChatGPT Connector", "version": "1.0.0"},
+        "servers": [{"url": "https://hubspot-connector.onrender.com"}]
     })
