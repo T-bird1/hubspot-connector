@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "ChatGPT Connector",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Connector API for HubSpot tickets, contacts, companies, deals, associations, properties, workflows, knowledge base, and learning services."
   },
   "servers": [
