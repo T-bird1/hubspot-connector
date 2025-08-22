@@ -1,10 +1,15 @@
 from fastapi import FastAPI, Query, Path, Body
 from fastapi.responses import JSONResponse
 import httpx, os
-from typing import List, Optional, Dict, Any
+from typing import Optional, Dict, Any
 
 BRIDGE_URL = os.getenv("BRIDGE_URL")
 BRIDGE_SECRET = os.getenv("BRIDGE_SECRET")
+
+if not BRIDGE_URL:
+    raise RuntimeError("BRIDGE_URL env var is required")
+if not BRIDGE_SECRET:
+    raise RuntimeError("BRIDGE_SECRET env var is required")
 
 app = FastAPI(title="ChatGPT Connector (Full)")
 
@@ -187,26 +192,5 @@ def schema():
         "servers": [
             {"url": "https://hubspot-connector.onrender.com"},
             {"url": "https://hubspot-connector.onrender.com/"}
-        ],
-        "paths": {
-            "/health": {"get": {"operationId": "health"}},
-            "/tickets/top-companies": {"get": {"operationId": "ticketsTopCompanies"}},
-            "/tickets/search": {"post": {"operationId": "ticketsSearch"}},
-            "/tickets/update/{ticket_id}": {"patch": {"operationId": "ticketsUpdate"}},
-            "/contacts/get/{contact_id}": {"get": {"operationId": "contactsGet"}},
-            "/contacts/upsert": {"post": {"operationId": "contactsUpsert"}},
-            "/contacts/search": {"post": {"operationId": "contactsSearch"}},
-            "/companies/get/{company_id}": {"get": {"operationId": "companiesGet"}},
-            "/companies/upsert": {"post": {"operationId": "companiesUpsert"}},
-            "/companies/search": {"post": {"operationId": "companiesSearch"}},
-            "/deals/get/{deal_id}": {"get": {"operationId": "dealsGet"}},
-            "/deals/upsert": {"post": {"operationId": "dealsUpsert"}},
-            "/deals/search": {"post": {"operationId": "dealsSearch"}},
-            "/associations/create": {"post": {"operationId": "associationsCreate"}},
-            "/properties/list/{object_type}": {"get": {"operationId": "propertiesList"}},
-            "/properties/update/{object_type}/{property_name}": {"post": {"operationId": "propertiesUpdate"}},
-            "/workflows/list": {"get": {"operationId": "workflowsList"}},
-            "/kb/articles/list": {"get": {"operationId": "kbArticlesList"}},
-            "/kb/articles/create": {"post": {"operationId": "kbArticlesCreate"}},
-        }
+        ]
     })
