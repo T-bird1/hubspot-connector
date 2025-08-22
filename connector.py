@@ -1,6 +1,5 @@
 from fastapi import FastAPI, Query
 from fastapi.responses import JSONResponse
-from fastapi.openapi.utils import get_openapi
 import httpx, os
 
 BRIDGE_URL = os.getenv("BRIDGE_URL")
@@ -8,8 +7,11 @@ BRIDGE_SECRET = os.getenv("BRIDGE_SECRET")
 
 app = FastAPI(title="ChatGPT Connector")
 
-@app.get("/top-companies")
-async def top_companies(days: int = Query(0), top: int = Query(5)):
+# ---------------------------
+# Tickets Top Companies
+# ---------------------------
+@app.get("/ticketsTopCompanies")
+async def tickets_top_companies(days: int = Query(0), top: int = Query(5)):
     async with httpx.AsyncClient() as client:
         r = await client.get(
             f"{BRIDGE_URL}/tickets/top-companies",
@@ -19,9 +21,25 @@ async def top_companies(days: int = Query(0), top: int = Query(5)):
         )
         return r.json()
 
+# ---------------------------
+# Tickets Search
+# ---------------------------
+@app.get("/ticketsSearch")
+async def tickets_search(limit: int = Query(5)):
+    async with httpx.AsyncClient() as client:
+        r = await client.get(
+            f"{BRIDGE_URL}/tickets/search",
+            params={"limit": limit},
+            headers={"Authorization": BRIDGE_SECRET},
+            timeout=60
+        )
+        return r.json()
+
+# ---------------------------
+# Static OpenAPI schema
+# ---------------------------
 @app.get("/schema.json")
 def schema():
-    # Static OpenAPI schema with explicit servers
     return JSONResponse({
         "openapi": "3.0.1",
         "info": { "title": "ChatGPT Connector", "version": "1.0.0" },
@@ -30,9 +48,9 @@ def schema():
             { "url": "https://hubspot-connector.onrender.com/" }
         ],
         "paths": {
-            "/top-companies": {
+            "/ticketsTopCompanies": {
                 "get": {
-                    "operationId": "getTopCompanies",
+                    "operationId": "ticketsTopCompanies",
                     "summary": "Top companies by ticket count",
                     "parameters": [
                         { "name": "days", "in": "query", "schema": { "type": "integer", "minimum": 0 }, "required": False },
@@ -62,6 +80,28 @@ def schema():
                                             "total_tickets": { "type": "integer" }
                                         },
                                         "required": ["total_tickets"]
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "security": [{ "apiKeyAuth": [] }]
+                }
+            },
+            "/ticketsSearch": {
+                "get": {
+                    "operationId": "ticketsSearch",
+                    "summary": "Search tickets",
+                    "parameters": [
+                        { "name": "limit", "in": "query", "schema": { "type": "integer", "minimum": 1, "maximum": 100 }, "required": False }
+                    ],
+                    "responses": {
+                        "200": {
+                            "description": "OK",
+                            "content": {
+                                "application/json": {
+                                    "schema": {
+                                        "type": "object"
                                     }
                                 }
                             }
