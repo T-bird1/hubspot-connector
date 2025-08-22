@@ -1,13 +1,15 @@
 {
-  "openapi": "3.0.1",
+  "openapi": "3.0.0",
   "info": {
     "title": "ChatGPT Connector",
     "version": "1.0.0",
     "description": "Connector API for HubSpot tickets, contacts, companies, deals, associations, properties, workflows, knowledge base, and learning services."
   },
   "servers": [
-    { "url": "https://hubspot-connector.onrender.com" }
-  ],
+    { "url": "https://hubspot-connector.onrender.com/" ,
+"description": "Production server"
+  }
+],
   "paths": {
     "/ticketsTopCompanies": {
       "get": {
