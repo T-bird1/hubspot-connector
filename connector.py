@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Query
 from fastapi.responses import JSONResponse
-import httpx, os
+import httpx, os, json
 
 BRIDGE_URL = os.getenv("BRIDGE_URL")
 BRIDGE_SECRET = os.getenv("BRIDGE_SECRET")
@@ -215,23 +215,10 @@ async def learning_kb_candidates():
         return r.json()
 
 # ------------------------
-# Static Expanded Schema
+# Serve External Schema
 # ------------------------
 @app.get("/schema.json")
 def schema():
-    return JSONResponse({
-        "openapi": "3.0.1",
-        "info": {
-            "title": "ChatGPT Connector",
-            "version": "1.0.0",
-            "description": "Connector API for HubSpot tickets, contacts, companies, deals, associations, properties, workflows, knowledge base, and learning services."
-        },
-        "servers": [{ "url": "https://hubspot-connector.onrender.com" }],
-        "paths": " + """PUT THE FULL EXPANDED JSON PATHS OBJECT HERE FROM EARLIER ANSWER""" + ",
-        "components": {
-            "securitySchemes": {
-                "apiKeyAuth": { "type": "apiKey", "in": "header", "name": "Authorization" }
-            }
-        },
-        "security": [{ "apiKeyAuth": [] }]
-    })
+    with open("schema.json", "r") as f:
+        schema_data = json.load(f)
+    return JSONResponse(schema_data)
