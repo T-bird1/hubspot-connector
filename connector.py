@@ -141,4 +141,7 @@ def schema():
         },
         "components": {
             "securitySchemes": {
-                "apiKeyAuth": {"type": "apiKey", "in": "header", "name": "Authorization"
+                "apiKeyAuth": {"type": "apiKey", "in": "header", "name": "Authorization"}
+            }
+        }
+    })
