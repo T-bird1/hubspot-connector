@@ -1,0 +1,17 @@
+{
+  "schema_version": "v1",
+  "name_for_human": "HubSpot Connector",
+  "name_for_model": "hubspot_connector_onrender_com__jit_plugin",
+  "description_for_human": "Access HubSpot tickets, contacts, companies, deals, workflows, knowledge base, and learning services.",
+  "description_for_model": "Plugin for managing HubSpot CRM data. Provides endpoints for tickets, contacts, companies, deals, associations, workflows, KB, and learning insights.",
+  "auth": {
+    "type": "none"
+  },
+  "api": {
+    "type": "openapi",
+    "url": "https://hubspot-connector.onrender.com/schema.json"
+  },
+  "logo_url": "https://hubspot-connector.onrender.com/logo.png",
+  "contact_email": "support@yourcompany.com",
+  "legal_info_url": "https://yourcompany.com/legal"
+}
