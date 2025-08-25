@@ -6,10 +6,10 @@ import httpx, os, json
 BRIDGE_URL = os.getenv("BRIDGE_URL")
 BRIDGE_SECRET = os.getenv("BRIDGE_SECRET")
 
-app = FastAPI(title="ChatGPT Connector")
+app = FastAPI(title="ChatGPT Connector with Filters")
 
 # ------------------------
-# Helper: auth header (send raw secret, no 'Bearer ')
+# Helper: auth header
 # ------------------------
 def build_bridge_headers():
     return {"Authorization": BRIDGE_SECRET} if BRIDGE_SECRET else {}
@@ -18,7 +18,7 @@ def build_bridge_headers():
 # Helper: retry with backoff + safe JSONResponse
 # ------------------------
 async def fetch_with_retries(url, method="GET", params=None, body=None, max_retries=5):
-    backoff = 1  # start at 1 second
+    backoff = 1
     async with httpx.AsyncClient() as client:
         for attempt in range(max_retries):
             if method == "GET":
@@ -49,11 +49,14 @@ async def fetch_with_retries(url, method="GET", params=None, body=None, max_retr
 # Tickets
 # ------------------------
 @app.get("/tickets/top-companies")
-async def tickets_top_companies(days: int = Query(0), top: int = Query(5), pipeline: str = None, stage: str = None):
+async def tickets_top_companies(days: int = Query(0), top: int = Query(5), pipeline: str = None, stage: str = None,
+                                createdAfter: str = None, createdBefore: str = None):
+    params = {"days": days, "top": top, "pipeline": pipeline, "stage": stage, 
+              "createdAfter": createdAfter, "createdBefore": createdBefore}
     return await fetch_with_retries(
         f"{BRIDGE_URL}/tickets/top-companies",
         method="GET",
-        params={"days": days, "top": top, "pipeline": pipeline, "stage": stage}
+        params={k: v for k, v in params.items() if v is not None}
     )
 
 @app.post("/tickets/search")
@@ -169,11 +172,12 @@ async def workflows_list():
 # Knowledge Base
 # ------------------------
 @app.get("/kb/articles/list")
-async def kb_articles_list(limit: int = Query(20), after: str = None):
+async def kb_articles_list(limit: int = Query(20), after: str = None, createdAfter: str = None, createdBefore: str = None):
+    params = {"limit": limit, "after": after, "createdAfter": createdAfter, "createdBefore": createdBefore}
     return await fetch_with_retries(
         f"{BRIDGE_URL}/kb/articles/list",
         method="GET",
-        params={"limit": limit, "after": after}
+        params={k: v for k, v in params.items() if v is not None}
     )
 
 @app.post("/kb/articles/create")
