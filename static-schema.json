@@ -1,8 +1,8 @@
 {
-  "openapi": "3.0.1",
+  "openapi": "3.1.0",
   "info": {
     "title": "ChatGPT Connector",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "description": "Connector API for HubSpot tickets, contacts, companies, deals, associations, properties, workflows, knowledge base, and learning services. Responses always return application/json."
   },
   "servers": [
@@ -22,88 +22,239 @@
           { "name": "pipeline", "in": "query", "schema": { "type": "string" } },
           { "name": "stage", "in": "query", "schema": { "type": "string" } }
         ],
-        "responses": { "200": { "description": "Top companies", "content": { "application/json": { "schema": { "type": "object" } } } } }
+        "responses": {
+          "200": {
+            "description": "Top companies",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AnyObject" }
+              }
+            }
+          }
+        }
       }
     },
     "/ticketsSearch": {
       "post": {
         "operationId": "ticketsSearch",
         "summary": "Search tickets",
-        "requestBody": { "required": true, "content": { "application/json": { "schema": { "type": "object" } } } },
-        "responses": { "200": { "description": "Ticket search results", "content": { "application/json": { "schema": { "type": "object" } } } } }
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AnyObject" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ticket search results",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AnyObject" }
+              }
+            }
+          }
+        }
       }
     },
     "/ticketsUpdate/{ticket_id}": {
       "patch": {
         "operationId": "ticketsUpdate",
         "summary": "Update a ticket",
-        "parameters": [ { "name": "ticket_id", "in": "path", "required": true, "schema": { "type": "string" } } ],
-        "requestBody": { "required": true, "content": { "application/json": { "schema": { "type": "object" } } } },
-        "responses": { "200": { "description": "Updated ticket", "content": { "application/json": { "schema": { "type": "object" } } } } }
+        "parameters": [
+          { "name": "ticket_id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AnyObject" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated ticket",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AnyObject" }
+              }
+            }
+          }
+        }
       }
     },
     "/contactsGet/{contact_id}": {
       "get": {
         "operationId": "contactsGet",
         "summary": "Get a contact",
-        "parameters": [ { "name": "contact_id", "in": "path", "required": true, "schema": { "type": "string" } } ],
-        "responses": { "200": { "description": "Contact object", "content": { "application/json": { "schema": { "type": "object" } } } } }
+        "parameters": [
+          { "name": "contact_id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Contact object",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AnyObject" }
+              }
+            }
+          }
+        }
       }
     },
     "/contactsUpsert": {
       "post": {
         "operationId": "contactsUpsert",
         "summary": "Create or update a contact",
-        "requestBody": { "required": true, "content": { "application/json": { "schema": { "type": "object" } } } },
-        "responses": { "200": { "description": "Upserted contact", "content": { "application/json": { "schema": { "type": "object" } } } } }
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AnyObject" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Upserted contact",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AnyObject" }
+              }
+            }
+          }
+        }
       }
     },
     "/companiesGet/{company_id}": {
       "get": {
         "operationId": "companiesGet",
         "summary": "Get a company",
-        "parameters": [ { "name": "company_id", "in": "path", "required": true, "schema": { "type": "string" } } ],
-        "responses": { "200": { "description": "Company object", "content": { "application/json": { "schema": { "type": "object" } } } } }
+        "parameters": [
+          { "name": "company_id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Company object",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AnyObject" }
+              }
+            }
+          }
+        }
       }
     },
     "/companiesUpsert": {
       "post": {
         "operationId": "companiesUpsert",
         "summary": "Create or update a company",
-        "requestBody": { "required": true, "content": { "application/json": { "schema": { "type": "object" } } } },
-        "responses": { "200": { "description": "Upserted company", "content": { "application/json": { "schema": { "type": "object" } } } } }
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AnyObject" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Upserted company",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AnyObject" }
+              }
+            }
+          }
+        }
       }
     },
     "/dealsGet/{deal_id}": {
       "get": {
         "operationId": "dealsGet",
         "summary": "Get a deal",
-        "parameters": [ { "name": "deal_id", "in": "path", "required": true, "schema": { "type": "string" } } ],
-        "responses": { "200": { "description": "Deal object", "content": { "application/json": { "schema": { "type": "object" } } } } }
+        "parameters": [
+          { "name": "deal_id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deal object",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AnyObject" }
+              }
+            }
+          }
+        }
       }
     },
     "/dealsUpsert": {
       "post": {
         "operationId": "dealsUpsert",
         "summary": "Create or update a deal",
-        "requestBody": { "required": true, "content": { "application/json": { "schema": { "type": "object" } } } },
-        "responses": { "200": { "description": "Upserted deal", "content": { "application/json": { "schema": { "type": "object" } } } } }
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AnyObject" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Upserted deal",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AnyObject" }
+              }
+            }
+          }
+        }
       }
     },
     "/associationsCreate": {
       "post": {
         "operationId": "associationsCreate",
         "summary": "Create an association",
-        "requestBody": { "required": true, "content": { "application/json": { "schema": { "type": "object" } } } },
-        "responses": { "200": { "description": "Association created", "content": { "application/json": { "schema": { "type": "object" } } } } }
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AnyObject" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Association created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AnyObject" }
+              }
+            }
+          }
+        }
       }
     },
     "/propertiesList/{object_type}": {
       "get": {
         "operationId": "propertiesList",
         "summary": "List properties for an object type",
-        "parameters": [ { "name": "object_type", "in": "path", "required": true, "schema": { "type": "string" } } ],
-        "responses": { "200": { "description": "Properties list", "content": { "application/json": { "schema": { "type": "object" } } } } }
+        "parameters": [
+          { "name": "object_type", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Properties list",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AnyObject" }
+              }
+            }
+          }
+        }
       }
     },
     "/propertiesUpdate/{object_type}/{property_name}": {
@@ -114,15 +265,40 @@
           { "name": "object_type", "in": "path", "required": true, "schema": { "type": "string" } },
           { "name": "property_name", "in": "path", "required": true, "schema": { "type": "string" } }
         ],
-        "requestBody": { "required": true, "content": { "application/json": { "schema": { "type": "object" } } } },
-        "responses": { "200": { "description": "Property updated", "content": { "application/json": { "schema": { "type": "object" } } } } }
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AnyObject" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Property updated",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AnyObject" }
+              }
+            }
+          }
+        }
       }
     },
     "/workflowsList": {
       "get": {
         "operationId": "workflowsList",
         "summary": "List workflows",
-        "responses": { "200": { "description": "Workflows list", "content": { "application/json": { "schema": { "type": "object" } } } } }
+        "responses": {
+          "200": {
+            "description": "Workflows list",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AnyObject" }
+              }
+            }
+          }
+        }
       }
     },
     "/kbArticlesList": {
@@ -133,36 +309,97 @@
           { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 20 } },
           { "name": "after", "in": "query", "schema": { "type": "string" } }
         ],
-        "responses": { "200": { "description": "KB articles list", "content": { "application/json": { "schema": { "type": "object" } } } } }
+        "responses": {
+          "200": {
+            "description": "KB articles list",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AnyObject" }
+              }
+            }
+          }
+        }
       }
     },
     "/kbArticlesCreate": {
       "post": {
         "operationId": "kbArticlesCreate",
         "summary": "Create a knowledge base article",
-        "requestBody": { "required": true, "content": { "application/json": { "schema": { "type": "object" } } } },
-        "responses": { "200": { "description": "Created article", "content": { "application/json": { "schema": { "type": "object" } } } } }
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AnyObject" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Created article",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AnyObject" }
+              }
+            }
+          }
+        }
       }
     },
     "/learningSuggestions": {
       "get": {
         "operationId": "learningSuggestions",
         "summary": "Get learning suggestions",
-        "responses": { "200": { "description": "Learning suggestions", "content": { "application/json": { "schema": { "type": "object" } } } } }
+        "responses": {
+          "200": {
+            "description": "Learning suggestions",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AnyObject" }
+              }
+            }
+          }
+        }
       }
     },
     "/learningKbCandidates": {
       "get": {
         "operationId": "learningKbCandidates",
         "summary": "Get learning KB candidates",
-        "responses": { "200": { "description": "Learning KB candidates", "content": { "application/json": { "schema": { "type": "object" } } } } }
+        "responses": {
+          "200": {
+            "description": "Learning KB candidates",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AnyObject" }
+              }
+            }
+          }
+        }
       }
     },
     "/schema.json": {
       "get": {
         "operationId": "getSchema",
         "summary": "Serve schema",
-        "responses": { "200": { "description": "OpenAPI schema", "content": { "application/json": { "schema": { "type": "object" } } } } }
+        "responses": {
+          "200": {
+            "description": "OpenAPI schema",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AnyObject" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AnyObject": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": true
       }
     }
   }
