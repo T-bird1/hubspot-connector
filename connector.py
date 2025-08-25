@@ -209,3 +209,12 @@ def schema():
     with open("static-schema.json", "r") as f:
         schema_data = json.load(f)
     return JSONResponse(schema_data)
+
+# ------------------------
+# Serve Plugin Manifest
+# ------------------------
+@app.get("/.well-known/ai-plugin.json")
+def serve_plugin_manifest():
+    with open(".well-known/ai-plugin.json", "r") as f:
+        manifest = json.load(f)
+    return JSONResponse(manifest)
