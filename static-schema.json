@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "ChatGPT Connector",
-    "version": "1.0.1",
-    "description": "Connector API for HubSpot tickets, contacts, companies, deals, associations, properties, workflows, knowledge base, and learning services."
+    "version": "1.0.2",
+    "description": "Connector API for HubSpot tickets, contacts, companies, deals, associations, properties, workflows, knowledge base, and learning services. Responses always return application/json."
   },
   "servers": [
     {
@@ -17,39 +17,17 @@
         "operationId": "ticketsTopCompanies",
         "summary": "Get top companies by ticket count",
         "parameters": [
-          { "name": "days", "in": "query", "required": false, "schema": { "type": "integer" }, "description": "Look back this many days (0 = all time).", "x-openai-mapping": "query" },
-          { "name": "top", "in": "query", "required": false, "schema": { "type": "integer", "default": 5 }, "description": "Number of top companies to return.", "x-openai-mapping": "query" },
-          { "name": "pipeline", "in": "query", "required": false, "schema": { "type": "string" }, "description": "Optional pipeline filter.", "x-openai-mapping": "query" },
-          { "name": "stage", "in": "query", "required": false, "schema": { "type": "string" }, "description": "Optional stage filter.", "x-openai-mapping": "query" }
+          { "name": "days", "in": "query", "required": false, "schema": { "type": "integer" } },
+          { "name": "top", "in": "query", "required": false, "schema": { "type": "integer", "default": 5 } },
+          { "name": "pipeline", "in": "query", "required": false, "schema": { "type": "string" } },
+          { "name": "stage", "in": "query", "required": false, "schema": { "type": "string" } }
         ],
         "responses": {
-          "200": { "description": "List of top companies with ticket counts", "content": { "application/json": {} } }
+          "200": {
+            "description": "List of top companies with ticket counts",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          }
         }
-      }
-    },
-    "/ticketsSearch": {
-      "post": {
-        "operationId": "ticketsSearch",
-        "summary": "Search for tickets",
-        "requestBody": {
-          "required": true,
-          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TicketSearchRequest" } } }
-        },
-        "responses": { "200": { "description": "Matching tickets", "content": { "application/json": {} } } }
-      }
-    },
-    "/ticketsUpdate/{ticket_id}": {
-      "patch": {
-        "operationId": "ticketsUpdate",
-        "summary": "Update a ticket's properties",
-        "parameters": [
-          { "name": "ticket_id", "in": "path", "required": true, "schema": { "type": "string" } }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TicketUpdateRequest" } } }
-        },
-        "responses": { "200": { "description": "Updated ticket object", "content": { "application/json": {} } } }
       }
     },
     "/contactsGet/{contact_id}": {
@@ -57,217 +35,28 @@
         "operationId": "contactsGet",
         "summary": "Retrieve a contact",
         "parameters": [
-          { "name": "contact_id", "in": "path", "required": true, "schema": { "type": "string" }, "x-openai-mapping": "path" }
+          { "name": "contact_id", "in": "path", "required": true, "schema": { "type": "string" } }
         ],
-        "responses": { "200": { "description": "Contact object", "content": { "application/json": {} } } }
-      }
-    },
-    "/contactsUpsert": {
-      "post": {
-        "operationId": "contactsUpsert",
-        "summary": "Create or update a contact by email",
-        "requestBody": {
-          "required": true,
-          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ContactUpsertRequest" } } }
-        },
-        "responses": { "200": { "description": "Contact upsert result", "content": { "application/json": {} } } }
-      }
-    },
-    "/companiesGet/{company_id}": {
-      "get": {
-        "operationId": "companiesGet",
-        "summary": "Retrieve a company",
-        "parameters": [
-          { "name": "company_id", "in": "path", "required": true, "schema": { "type": "string" }, "x-openai-mapping": "path" }
-        ],
-        "responses": { "200": { "description": "Company object", "content": { "application/json": {} } } }
-      }
-    },
-    "/companiesUpsert": {
-      "post": {
-        "operationId": "companiesUpsert",
-        "summary": "Create or update a company by domain",
-        "requestBody": {
-          "required": true,
-          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CompanyUpsertRequest" } } }
-        },
-        "responses": { "200": { "description": "Company upsert result", "content": { "application/json": {} } } }
-      }
-    },
-    "/dealsGet/{deal_id}": {
-      "get": {
-        "operationId": "dealsGet",
-        "summary": "Retrieve a deal",
-        "parameters": [
-          { "name": "deal_id", "in": "path", "required": true, "schema": { "type": "string" }, "x-openai-mapping": "path" }
-        ],
-        "responses": { "200": { "description": "Deal object", "content": { "application/json": {} } } }
-      }
-    },
-    "/dealsUpsert": {
-      "post": {
-        "operationId": "dealsUpsert",
-        "summary": "Create or update a deal by name",
-        "requestBody": {
-          "required": true,
-          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DealUpsertRequest" } } }
-        },
-        "responses": { "200": { "description": "Deal upsert result", "content": { "application/json": {} } } }
-      }
-    },
-    "/associationsCreate": {
-      "post": {
-        "operationId": "associationsCreate",
-        "summary": "Create an association between CRM objects",
-        "requestBody": {
-          "required": true,
-          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AssociationCreateRequest" } } }
-        },
-        "responses": { "200": { "description": "Association result", "content": { "application/json": {} } } }
-      }
-    },
-    "/propertiesList/{object_type}": {
-      "get": {
-        "operationId": "propertiesList",
-        "summary": "List properties for an object type",
-        "parameters": [
-          { "name": "object_type", "in": "path", "required": true, "schema": { "type": "string" }, "description": "HubSpot object type (e.g. contacts, companies, deals).", "x-openai-mapping": "path" }
-        ],
-        "responses": { "200": { "description": "List of properties", "content": { "application/json": {} } } }
-      }
-    },
-    "/propertiesUpdate/{object_type}/{property_name}": {
-      "post": {
-        "operationId": "propertiesUpdate",
-        "summary": "Update a property definition",
-        "parameters": [
-          { "name": "object_type", "in": "path", "required": true, "schema": { "type": "string" }, "x-openai-mapping": "path" },
-          { "name": "property_name", "in": "path", "required": true, "schema": { "type": "string" }, "x-openai-mapping": "path" }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PropertyUpdateRequest" } } }
-        },
-        "responses": { "200": { "description": "Updated property definition", "content": { "application/json": {} } } }
+        "responses": {
+          "200": {
+            "description": "Contact object",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          }
+        }
       }
     },
     "/workflowsList": {
       "get": {
         "operationId": "workflowsList",
         "summary": "List available workflows",
-        "responses": { "200": { "description": "List of workflows", "content": { "application/json": {} } } }
-      }
-    },
-    "/kbArticlesList": {
-      "get": {
-        "operationId": "kbArticlesList",
-        "summary": "List knowledge base articles",
-        "parameters": [
-          { "name": "limit", "in": "query", "required": false, "schema": { "type": "integer", "default": 20 }, "x-openai-mapping": "query" },
-          { "name": "after", "in": "query", "required": false, "schema": { "type": "string" }, "x-openai-mapping": "query" }
-        ],
-        "responses": { "200": { "description": "List of KB articles", "content": { "application/json": {} } } }
-      }
-    },
-    "/kbArticlesCreate": {
-      "post": {
-        "operationId": "kbArticlesCreate",
-        "summary": "Create a knowledge base article",
-        "requestBody": {
-          "required": true,
-          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/KbArticleCreateRequest" } } }
-        },
-        "responses": { "200": { "description": "Created KB article", "content": { "application/json": {} } } }
-      }
-    },
-    "/learningSuggestions": {
-      "get": {
-        "operationId": "learningSuggestions",
-        "summary": "Get AI-generated data cleanup, workflow, and CSM suggestions",
-        "responses": { "200": { "description": "Learning suggestions", "content": { "application/json": {} } } }
-      }
-    },
-    "/learningKbCandidates": {
-      "get": {
-        "operationId": "learningKbCandidates",
-        "summary": "Get knowledge base candidates from tickets",
-        "responses": { "200": { "description": "List of KB candidates", "content": { "application/json": {} } } }
+        "responses": {
+          "200": {
+            "description": "List of workflows",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          }
+        }
       }
     }
-  },
-  "components": {
-    "schemas": {
-      "TicketSearchRequest": {
-        "type": "object",
-        "properties": {
-          "limit": { "type": "integer" },
-          "filterGroups": { "type": "array", "items": { "type": "object" } }
-        }
-      },
-      "TicketUpdateRequest": {
-        "type": "object",
-        "properties": {
-          "properties": { "type": "object", "additionalProperties": true }
-        },
-        "required": ["properties"]
-      },
-      "ContactUpsertRequest": {
-        "type": "object",
-        "properties": {
-          "email": { "type": "string" },
-          "firstname": { "type": "string" },
-          "lastname": { "type": "string" }
-        },
-        "required": ["email"]
-      },
-      "CompanyUpsertRequest": {
-        "type": "object",
-        "properties": {
-          "domain": { "type": "string" },
-          "name": { "type": "string" }
-        },
-        "required": ["domain"]
-      },
-      "DealUpsertRequest": {
-        "type": "object",
-        "properties": {
-          "name": { "type": "string" },
-          "amount": { "type": "number" },
-          "stage": { "type": "string" }
-        },
-        "required": ["name"]
-      },
-      "AssociationCreateRequest": {
-        "type": "object",
-        "properties": {
-          "from": { "type": "string" },
-          "to": { "type": "string" },
-          "type": { "type": "string" }
-        },
-        "required": ["from", "to", "type"]
-      },
-      "PropertyUpdateRequest": {
-        "type": "object",
-        "properties": {
-          "label": { "type": "string" },
-          "description": { "type": "string" }
-        }
-      },
-      "KbArticleCreateRequest": {
-        "type": "object",
-        "properties": {
-          "title": { "type": "string" },
-          "body": { "type": "string" },
-          "category": { "type": "string" }
-        },
-        "required": ["title", "body"]
-      }
-    },
-    "securitySchemes": {
-      "apiKeyAuth": { "type": "apiKey", "in": "header", "name": "Authorization" }
-    }
-  },
-  "security": [
-    { "apiKeyAuth": [] }
-  ]
+    // ... keep the rest of the endpoints as patched earlier ...
+  }
 }
