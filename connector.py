@@ -22,30 +22,14 @@ async def fetch_with_retries(url, method="GET", params=None, body=None, max_retr
     async with httpx.AsyncClient() as client:
         for attempt in range(max_retries):
             if method == "GET":
-                r = await client.get(
-                    url,
-                    params=params,
-                    headers=build_bridge_headers(),
-                    timeout=60
-                )
+                r = await client.get(url, params=params, headers=build_bridge_headers(), timeout=60)
             elif method == "POST":
-                r = await client.post(
-                    url,
-                    json=body,
-                    headers=build_bridge_headers(),
-                    timeout=60
-                )
+                r = await client.post(url, json=body, headers=build_bridge_headers(), timeout=60)
             elif method == "PATCH":
-                r = await client.patch(
-                    url,
-                    json=body,
-                    headers=build_bridge_headers(),
-                    timeout=60
-                )
+                r = await client.patch(url, json=body, headers=build_bridge_headers(), timeout=60)
             else:
                 raise ValueError(f"Unsupported method {method}")
 
-            # Debug logging
             print("[Connector] Response status:", r.status_code)
             print("[Connector] Response text (first 500 chars):", r.text[:500])
 
@@ -64,7 +48,7 @@ async def fetch_with_retries(url, method="GET", params=None, body=None, max_retr
 # ------------------------
 # Tickets
 # ------------------------
-@app.get("/ticketsTopCompanies")
+@app.get("/tickets/top-companies")
 async def tickets_top_companies(days: int = Query(0), top: int = Query(5), pipeline: str = None, stage: str = None):
     return await fetch_with_retries(
         f"{BRIDGE_URL}/tickets/top-companies",
@@ -72,7 +56,7 @@ async def tickets_top_companies(days: int = Query(0), top: int = Query(5), pipel
         params={"days": days, "top": top, "pipeline": pipeline, "stage": stage}
     )
 
-@app.post("/ticketsSearch")
+@app.post("/tickets/search")
 async def tickets_search(body: dict):
     return await fetch_with_retries(
         f"{BRIDGE_URL}/tickets/search",
@@ -80,7 +64,7 @@ async def tickets_search(body: dict):
         body=body
     )
 
-@app.patch("/ticketsUpdate/{ticket_id}")
+@app.patch("/tickets/update/{ticket_id}")
 async def tickets_update(ticket_id: str, body: dict):
     return await fetch_with_retries(
         f"{BRIDGE_URL}/tickets/update/{ticket_id}",
@@ -91,14 +75,14 @@ async def tickets_update(ticket_id: str, body: dict):
 # ------------------------
 # Contacts
 # ------------------------
-@app.get("/contactsGet/{contact_id}")
+@app.get("/contacts/get/{contact_id}")
 async def contacts_get(contact_id: str):
     return await fetch_with_retries(
         f"{BRIDGE_URL}/contacts/get/{contact_id}",
         method="GET"
     )
 
-@app.post("/contactsUpsert")
+@app.post("/contacts/upsert")
 async def contacts_upsert(body: dict):
     return await fetch_with_retries(
         f"{BRIDGE_URL}/contacts/upsert",
@@ -109,14 +93,14 @@ async def contacts_upsert(body: dict):
 # ------------------------
 # Companies
 # ------------------------
-@app.get("/companiesGet/{company_id}")
+@app.get("/companies/get/{company_id}")
 async def companies_get(company_id: str):
     return await fetch_with_retries(
         f"{BRIDGE_URL}/companies/get/{company_id}",
         method="GET"
     )
 
-@app.post("/companiesUpsert")
+@app.post("/companies/upsert")
 async def companies_upsert(body: dict):
     return await fetch_with_retries(
         f"{BRIDGE_URL}/companies/upsert",
@@ -127,14 +111,14 @@ async def companies_upsert(body: dict):
 # ------------------------
 # Deals
 # ------------------------
-@app.get("/dealsGet/{deal_id}")
+@app.get("/deals/get/{deal_id}")
 async def deals_get(deal_id: str):
     return await fetch_with_retries(
         f"{BRIDGE_URL}/deals/get/{deal_id}",
         method="GET"
     )
 
-@app.post("/dealsUpsert")
+@app.post("/deals/upsert")
 async def deals_upsert(body: dict):
     return await fetch_with_retries(
         f"{BRIDGE_URL}/deals/upsert",
@@ -145,7 +129,7 @@ async def deals_upsert(body: dict):
 # ------------------------
 # Associations
 # ------------------------
-@app.post("/associationsCreate")
+@app.post("/associations/create")
 async def associations_create(body: dict):
     return await fetch_with_retries(
         f"{BRIDGE_URL}/associations/create",
@@ -156,14 +140,14 @@ async def associations_create(body: dict):
 # ------------------------
 # Properties
 # ------------------------
-@app.get("/propertiesList/{object_type}")
+@app.get("/properties/list/{object_type}")
 async def properties_list(object_type: str):
     return await fetch_with_retries(
         f"{BRIDGE_URL}/properties/list/{object_type}",
         method="GET"
     )
 
-@app.post("/propertiesUpdate/{object_type}/{property_name}")
+@app.post("/properties/update/{object_type}/{property_name}")
 async def properties_update(object_type: str, property_name: str, body: dict):
     return await fetch_with_retries(
         f"{BRIDGE_URL}/properties/update/{object_type}/{property_name}",
@@ -174,7 +158,7 @@ async def properties_update(object_type: str, property_name: str, body: dict):
 # ------------------------
 # Workflows
 # ------------------------
-@app.get("/workflowsList")
+@app.get("/workflows/list")
 async def workflows_list():
     return await fetch_with_retries(
         f"{BRIDGE_URL}/workflows/list",
@@ -184,7 +168,7 @@ async def workflows_list():
 # ------------------------
 # Knowledge Base
 # ------------------------
-@app.get("/kbArticlesList")
+@app.get("/kb/articles/list")
 async def kb_articles_list(limit: int = Query(20), after: str = None):
     return await fetch_with_retries(
         f"{BRIDGE_URL}/kb/articles/list",
@@ -192,7 +176,7 @@ async def kb_articles_list(limit: int = Query(20), after: str = None):
         params={"limit": limit, "after": after}
     )
 
-@app.post("/kbArticlesCreate")
+@app.post("/kb/articles/create")
 async def kb_articles_create(body: dict):
     return await fetch_with_retries(
         f"{BRIDGE_URL}/kb/articles/create",
@@ -203,14 +187,14 @@ async def kb_articles_create(body: dict):
 # ------------------------
 # Learner
 # ------------------------
-@app.get("/learningSuggestions")
+@app.get("/learning/suggestions")
 async def learning_suggestions():
     return await fetch_with_retries(
         f"{os.getenv('LEARNER_URL')}/learning/suggestions",
         method="GET"
     )
 
-@app.get("/learningKbCandidates")
+@app.get("/learning/kb-candidates")
 async def learning_kb_candidates():
     return await fetch_with_retries(
         f"{os.getenv('LEARNER_URL')}/learning/kb-candidates",
