@@ -9,6 +9,12 @@ BRIDGE_SECRET = os.getenv("BRIDGE_SECRET")
 app = FastAPI(title="ChatGPT Connector")
 
 # ------------------------
+# Helper: auth header (send raw secret, no 'Bearer ')
+# ------------------------
+def build_bridge_headers():
+    return {"Authorization": BRIDGE_SECRET} if BRIDGE_SECRET else {}
+
+# ------------------------
 # Helper: retry with backoff + safe JSONResponse
 # ------------------------
 async def fetch_with_retries(url, method="GET", params=None, body=None, max_retries=5):
@@ -19,21 +25,21 @@ async def fetch_with_retries(url, method="GET", params=None, body=None, max_retr
                 r = await client.get(
                     url,
                     params=params,
-                    headers={"Authorization": BRIDGE_SECRET},
+                    headers=build_bridge_headers(),
                     timeout=60
                 )
             elif method == "POST":
                 r = await client.post(
                     url,
                     json=body,
-                    headers={"Authorization": BRIDGE_SECRET},
+                    headers=build_bridge_headers(),
                     timeout=60
                 )
             elif method == "PATCH":
                 r = await client.patch(
                     url,
                     json=body,
-                    headers={"Authorization": BRIDGE_SECRET},
+                    headers=build_bridge_headers(),
                     timeout=60
                 )
             else:
