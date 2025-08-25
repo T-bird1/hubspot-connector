@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "https://hubspot-connector.onrender.com/",
+      "url": "https://hubspot-connector.onrender.com",
       "description": "Production server"
     }
   ],
