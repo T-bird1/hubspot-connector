@@ -9,7 +9,7 @@ BRIDGE_SECRET = os.getenv("BRIDGE_SECRET")
 app = FastAPI(title="ChatGPT Connector")
 
 # ------------------------
-# Helper: retry with backoff
+# Helper: retry with backoff + safe JSONResponse
 # ------------------------
 async def fetch_with_retries(url, method="GET", params=None, body=None, max_retries=5):
     backoff = 1  # start at 1 second
@@ -39,17 +39,21 @@ async def fetch_with_retries(url, method="GET", params=None, body=None, max_retr
             else:
                 raise ValueError(f"Unsupported method {method}")
 
-            # If not rate limited → return result
-            if r.status_code != 429:
-                return r.json()
+            # Debug logging
+            print("[Connector] Response status:", r.status_code)
+            print("[Connector] Response text (first 500 chars):", r.text[:500])
 
-            # Rate limited → wait and retry
+            if r.status_code != 429:
+                try:
+                    return JSONResponse(content=r.json(), status_code=r.status_code)
+                except Exception:
+                    return JSONResponse(content={"raw": r.text}, status_code=r.status_code)
+
             retry_after = int(r.headers.get("Retry-After", backoff))
             await asyncio.sleep(retry_after)
-            backoff *= 2  # exponential backoff
+            backoff *= 2
 
-        # Too many retries
-        return {"error": "Rate limit exceeded after retries"}
+        return JSONResponse(content={"error": "Rate limit exceeded after retries"}, status_code=429)
 
 # ------------------------
 # Tickets
@@ -212,7 +216,6 @@ async def learning_kb_candidates():
 # ------------------------
 @app.get("/schema.json")
 def schema():
-    # Always serve the patched static-schema.json so ChatGPT gets correct mappings
     with open("static-schema.json", "r") as f:
         schema_data = json.load(f)
     return JSONResponse(schema_data)
